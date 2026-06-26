@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Browse Properties — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Filter sidebar -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-funnel"></i> Filters</h5>
+                    <form method="get">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Keyword</label>
+                            <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Search...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">City</label>
+                            <input type="text" name="city" value="{{ filters.city }}" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Property Type</label>
+                            <select name="property_type" class="form-select form-select-sm">
+                                <option value="">Any</option>
+                                {% for val, label in property_types %}
+                                <option value="{{ val }}" {% if filters.property_type == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Listing</label>
+                            <select name="listing_type" class="form-select form-select-sm">
+                                <option value="">Any</option>
+                                {% for val, label in listing_types %}
+                                <option value="{{ val }}" {% if filters.listing_type == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Min ₹</label>
+                                <input type="number" name="min_price" value="{{ filters.min_price }}" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Max ₹</label>
+                                <input type="number" name="max_price" value="{{ filters.max_price }}" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Min Beds</label>
+                                <input type="number" name="bedrooms" value="{{ filters.bedrooms }}" class="form-control form-control-sm" min="0">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Min Baths</label>
+                                <input type="number" name="bathrooms" value="{{ filters.bathrooms }}" class="form-control form-control-sm" min="0">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100 btn-sm mb-2">Apply Filters</button>
+                        <a href="{% url 'property_list' %}" class="btn btn-outline-secondary w-100 btn-sm">Reset</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h4 class="fw-bold mb-0">{{ total }} Propert{{ total|pluralize:"y,ies" }} Found</h4>
+                <form method="get" id="sortForm">
+                    {% for key, value in filters.items %}{% if key != 'sort' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+                    <select name="sort" class="form-select form-select-sm" onchange="document.getElementById('sortForm').submit()" style="width:auto">
+                        <option value="">Newest First</option>
+                        <option value="price_low" {% if filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="row g-4">
+                {% for property in page_obj %}
+                    <div class="col-md-6 col-xl-4">{% include 'partials/_property_card.html' %}</div>
+                {% empty %}
+                    <div class="col-12"><div class="alert alert-light border text-center py-5">
+                        <i class="bi bi-search fs-1 text-muted"></i>
+                        <p class="mt-2 mb-0">No properties match your filters. Try widening your search.</p>
+                    </div></div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">«</a></li>
+                    {% endif %}
+                    {% for n in page_obj.paginator.page_range %}
+                        {% if n == page_obj.number %}
+                            <li class="page-item active"><span class="page-link">{{ n }}</span></li>
+                        {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?{{ querystring }}&page={{ n }}">{{ n }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&page={{ page_obj.next_page_number }}">»</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

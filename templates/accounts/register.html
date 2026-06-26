@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Register — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card auth-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill fs-1 text-primary"></i>
+                        <h3 class="fw-bold mt-2">Create Account</h3>
+                        <p class="text-muted">Join EstateHub today — it's free</p>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<small class="text-danger">{{ form.username.errors|striptags }}</small>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<small class="text-danger">{{ form.email.errors|striptags }}</small>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">I am a...</label>
+                            <div class="d-flex gap-3">
+                                {% for radio in form.role %}
+                                <label class="border rounded p-2 flex-fill" style="cursor:pointer">{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}<small class="text-danger">{{ form.password1.errors|striptags }}</small>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}<small class="text-danger">{{ form.password2.errors|striptags }}</small>{% endif %}
+                        </div>
+                        <button class="btn btn-primary w-100 mb-3">Create Account</button>
+                    </form>
+                    <p class="text-center text-muted mb-0">Already registered? <a href="{% url 'accounts:login' %}">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Buyer Dashboard — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-1">Buyer Dashboard</h3>
+    <p class="text-muted">Welcome back, {{ user.username }} 👋</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4"><div class="dash-stat bg-grad-rose"><div class="n">{{ favorites.count }}</div><div>Saved Properties</div></div></div>
+        <div class="col-6 col-md-4"><div class="dash-stat bg-grad-cyan"><div class="n">{{ unread }}</div><div>Unread Messages</div></div></div>
+        <div class="col-12 col-md-4"><a href="{% url 'property_list' %}" class="dash-stat bg-grad-blue text-decoration-none d-block"><div class="n"><i class="bi bi-search"></i></div><div>Browse Properties</div></a></div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-heart-fill text-danger"></i> My Favorites</h5>
+                <a href="{% url 'my_favorites' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="row g-3">
+                {% for fav in favorites|slice:":6" %}
+                    {% with property=fav.property %}
+                    <div class="col-md-6 col-lg-4">{% include 'partials/_property_card.html' %}</div>
+                    {% endwith %}
+                {% empty %}
+                    <div class="col-12 text-center text-muted py-4">No saved properties yet. <a href="{% url 'property_list' %}">Start browsing!</a></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

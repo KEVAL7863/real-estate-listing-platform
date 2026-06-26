@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Admin Dashboard — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div><h3 class="fw-bold mb-0">Admin Dashboard</h3><p class="text-muted mb-0">Platform overview & moderation</p></div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'manage_properties' %}" class="btn btn-outline-primary"><i class="bi bi-buildings"></i> Properties</a>
+            <a href="{% url 'manage_users' %}" class="btn btn-outline-primary"><i class="bi bi-people"></i> Users</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-blue"><div class="n">{{ stats.total_properties }}</div><div>Properties</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-amber"><div class="n">{{ stats.pending }}</div><div>Pending Approval</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-green"><div class="n">{{ stats.approved }}</div><div>Approved</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-slate"><div class="n">{{ stats.total_users }}</div><div>Users</div></div></div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3"><i class="bi bi-hourglass-split text-warning"></i> Properties Awaiting Approval</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light"><tr><th>Property</th><th>Owner</th><th>City</th><th>Price</th><th>Submitted</th><th>Action</th></tr></thead>
+                    <tbody>
+                        {% for p in pending_properties %}
+                        <tr>
+                            <td><a href="{{ p.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ p.title|truncatechars:30 }}</a></td>
+                            <td>{{ p.owner.username }}</td>
+                            <td>{{ p.city }}</td>
+                            <td>₹{{ p.price|floatformat:0|intcomma }}</td>
+                            <td><small class="text-muted">{{ p.created_at|date:"d M Y" }}</small></td>
+                            <td>
+                                <a href="{% url 'moderate_property' p.id 'approve' %}" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Approve</a>
+                                <a href="{% url 'moderate_property' p.id 'reject' %}" class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Reject</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted py-4"><i class="bi bi-check-circle text-success"></i> No properties pending approval.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

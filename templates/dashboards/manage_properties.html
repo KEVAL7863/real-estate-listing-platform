@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Manage Properties — Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-3">Manage Properties</h3>
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a href="{% url 'manage_properties' %}" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+        {% for val, label in statuses %}
+        <a href="?status={{ val }}" class="btn btn-sm {% if status == val %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light"><tr><th>Property</th><th>Owner</th><th>City</th><th>Price</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for p in page_obj %}
+                    <tr>
+                        <td><a href="{{ p.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ p.title|truncatechars:28 }}</a></td>
+                        <td>{{ p.owner.username }}</td>
+                        <td>{{ p.city }}</td>
+                        <td>₹{{ p.price|floatformat:0|intcomma }}</td>
+                        <td><span class="status-ribbon status-{{ p.status }}">{{ p.get_status_display }}</span></td>
+                        <td>{% if p.is_featured %}<i class="bi bi-star-fill text-warning"></i>{% else %}<i class="bi bi-star text-muted"></i>{% endif %}</td>
+                        <td class="text-nowrap">
+                            <a href="{% url 'moderate_property' p.id 'approve' %}" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check-lg"></i></a>
+                            <a href="{% url 'moderate_property' p.id 'reject' %}" class="btn btn-sm btn-outline-danger" title="Reject"><i class="bi bi-x-lg"></i></a>
+                            <a href="{% url 'moderate_property' p.id 'feature' %}" class="btn btn-sm btn-outline-warning" title="Toggle Featured"><i class="bi bi-star"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No properties found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav><ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status %}&status={{ status }}{% endif %}">«</a></li>{% endif %}
+            {% for n in page_obj.paginator.page_range %}<li class="page-item {% if n == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ n }}{% if status %}&status={{ status }}{% endif %}">{{ n }}</a></li>{% endfor %}
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status %}&status={{ status }}{% endif %}">»</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div></div>
+</div>
+{% endblock %}

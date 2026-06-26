@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Conversation — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <a href="{% url 'messaging:inbox' %}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Inbox</a>
+
+            <div class="card border-0 shadow-sm mt-2">
+                <div class="card-header bg-white d-flex align-items-center gap-3 py-3">
+                    <i class="bi bi-person-circle fs-2 text-primary"></i>
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ other.get_full_name|default:other.username }}</h6>
+                        <small class="text-muted">Re: <a href="{{ conv.property.get_absolute_url }}">{{ conv.property.title|truncatechars:40 }}</a></small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chat-box">
+                        {% for msg in conv.messages.all %}
+                        <div class="msg-bubble {% if msg.sender == user %}msg-mine{% else %}msg-theirs{% endif %}">
+                            <div>{{ msg.body|linebreaksbr }}</div>
+                            <small class="d-block text-end {% if msg.sender == user %}text-white-50{% else %}text-muted{% endif %}" style="font-size:.7rem">{{ msg.created_at|date:"d M, H:i" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No messages yet. Say hello!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <form method="post" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="body" class="form-control" placeholder="Type your message..." autocomplete="off" required>
+                        <button class="btn btn-primary"><i class="bi bi-send"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

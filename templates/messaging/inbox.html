@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Inbox — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4"><i class="bi bi-inbox"></i> Inbox</h3>
+    <div class="card border-0 shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for t in threads %}
+            <a href="{% url 'messaging:conversation' t.conv.id %}" class="list-group-item list-group-item-action thread-item py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-person-circle fs-2 text-primary"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold">
+                                {% if t.conv.buyer == user %}{{ t.conv.owner.username }}{% else %}{{ t.conv.buyer.username }}{% endif %}
+                                {% if t.unread %}<span class="badge bg-danger ms-1">New</span>{% endif %}
+                            </h6>
+                            <small class="text-muted">Re: {{ t.conv.property.title|truncatechars:40 }}</small>
+                            {% if t.last %}<p class="mb-0 text-muted small">{{ t.last.sender.username }}: {{ t.last.body|truncatechars:60 }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <small class="text-muted">{% if t.last %}{{ t.last.created_at|date:"d M, H:i" }}{% endif %}</small>
+                </div>
+            </a>
+            {% empty %}
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-chat-square-dots fs-1"></i>
+                <p class="mt-2 mb-0">No conversations yet. Message a property owner to get started.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

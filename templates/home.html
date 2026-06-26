@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+
+<section class="hero">
+    <div class="container text-center">
+        <h1 class="mb-3 fade-up">Find Your Perfect <span class="text-warning">Property</span></h1>
+        <p class="lead mb-0 fade-up">Discover {{ stats.total }}+ verified homes, apartments & plots across {{ stats.cities }} cities.</p>
+    </div>
+</section>
+
+<div class="container">
+    <form action="{% url 'property_list' %}" method="get" class="search-card">
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label small fw-semibold text-muted">Keyword / City</label>
+                <input type="text" name="q" class="form-control" placeholder="e.g. sea view, Mumbai">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label small fw-semibold text-muted">Property Type</label>
+                <select name="property_type" class="form-select">
+                    <option value="">Any Type</option>
+                    {% for val, label in property_types %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-2 col-6">
+                <label class="form-label small fw-semibold text-muted">Min ₹</label>
+                <input type="number" name="min_price" class="form-control" placeholder="0">
+            </div>
+            <div class="col-lg-2 col-6">
+                <label class="form-label small fw-semibold text-muted">Max ₹</label>
+                <input type="number" name="max_price" class="form-control" placeholder="Any">
+            </div>
+            <div class="col-lg-1 col-12">
+                <button class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Stats -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-6 col-md-3"><div class="stat-box"><div class="num">{{ stats.total }}</div><div class="lbl">Listings</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box"><div class="num">{{ stats.for_sale }}</div><div class="lbl">For Sale</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box"><div class="num">{{ stats.for_rent }}</div><div class="lbl">For Rent</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box"><div class="num">{{ stats.cities }}</div><div class="lbl">Cities</div></div></div>
+    </div>
+</div>
+
+<!-- Categories -->
+<section class="container mt-5">
+    <h3 class="fw-bold mb-4">Browse by Category</h3>
+    <div class="row g-3">
+        {% for val, label in property_types %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="{% url 'property_list' %}?property_type={{ val }}" class="category-tile">
+                <i class="bi
+                    {% if val == 'HOUSE' %}bi-house-door
+                    {% elif val == 'APARTMENT' %}bi-building
+                    {% elif val == 'VILLA' %}bi-house-heart
+                    {% elif val == 'PLOT' %}bi-map
+                    {% elif val == 'COMMERCIAL' %}bi-shop
+                    {% else %}bi-briefcase{% endif %}"></i>
+                <div class="mt-2 fw-semibold">{{ label }}</div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured -->
+<section class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">⭐ Featured Properties</h3>
+        <a href="{% url 'property_list' %}" class="btn btn-outline-primary btn-sm">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+        {% for property in featured %}
+            <div class="col-md-6 col-lg-4">{% include 'partials/_property_card.html' %}</div>
+        {% empty %}
+            <div class="col-12"><div class="alert alert-light border text-center py-5">
+                <i class="bi bi-house-x fs-1 text-muted"></i>
+                <p class="mt-2 mb-0">No properties yet. {% if user.is_authenticated and user.is_owner %}<a href="{% url 'property_create' %}">Add the first one!</a>{% else %}Check back soon.{% endif %}</p>
+            </div></div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Recent -->
+{% if recent %}
+<section class="container mt-5 mb-5">
+    <h3 class="fw-bold mb-4">🆕 Recently Added</h3>
+    <div class="row g-4">
+        {% for property in recent %}
+            <div class="col-md-6 col-lg-4">{% include 'partials/_property_card.html' %}</div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="py-5" style="background: linear-gradient(135deg,#2563eb,#1d4ed8);">
+    <div class="container text-center text-white">
+        <h2 class="fw-bold">Own a property? List it for free.</h2>
+        <p class="lead mb-4 text-white-50">Reach thousands of genuine buyers and renters today.</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'property_create' %}" class="btn btn-warning btn-lg fw-semibold">Add Your Property</a>
+        {% else %}
+            <a href="{% url 'accounts:register' %}" class="btn btn-warning btn-lg fw-semibold">Get Started Free</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

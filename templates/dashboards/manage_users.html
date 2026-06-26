@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users — Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-3">Manage Users</h3>
+    <div class="card border-0 shadow-sm"><div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light"><tr><th>Username</th><th>Email</th><th>Role</th><th>Phone</th><th>Joined</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for u in page_obj %}
+                    <tr>
+                        <td class="fw-semibold"><i class="bi bi-person-circle text-primary"></i> {{ u.username }}</td>
+                        <td>{{ u.email|default:"—" }}</td>
+                        <td><span class="badge bg-primary">{{ u.get_role_display }}</span></td>
+                        <td>{{ u.phone|default:"—" }}</td>
+                        <td><small class="text-muted">{{ u.date_joined|date:"d M Y" }}</small></td>
+                        <td>{% if u.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav><ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a></li>{% endif %}
+            {% for n in page_obj.paginator.page_range %}<li class="page-item {% if n == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ n }}">{{ n }}</a></li>{% endfor %}
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div></div>
+</div>
+{% endblock %}

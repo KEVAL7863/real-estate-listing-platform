@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Owner Dashboard — EstateHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="fw-bold mb-0">Owner Dashboard</h3>
+            <p class="text-muted mb-0">Welcome back, {{ user.username }} 👋</p>
+        </div>
+        <a href="{% url 'property_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Property</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-blue"><div class="n">{{ stats.total }}</div><div>Total Listings</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-green"><div class="n">{{ stats.approved }}</div><div>Approved</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-amber"><div class="n">{{ stats.pending }}</div><div>Pending</div></div></div>
+        <div class="col-6 col-md-3"><div class="dash-stat bg-grad-slate"><div class="n">{{ stats.views }}</div><div>Total Views</div></div></div>
+    </div>
+
+    {% if unread %}<div class="alert alert-info"><i class="bi bi-chat-dots"></i> You have <strong>{{ unread }}</strong> unread message{{ unread|pluralize }}. <a href="{% url 'messaging:inbox' %}">View inbox</a></div>{% endif %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">My Properties</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr><th>Property</th><th>Type</th><th>Price</th><th>Status</th><th>Views</th><th>♥</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for p in properties %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if p.primary_image %}<img src="{{ p.primary_image }}" style="width:48px;height:48px;object-fit:cover;border-radius:8px">{% else %}<div style="width:48px;height:48px;background:#e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="bi bi-house text-muted"></i></div>{% endif %}
+                                    <div><a href="{{ p.get_absolute_url }}" class="fw-semibold text-decoration-none">{{ p.title|truncatechars:30 }}</a><br><small class="text-muted">{{ p.city }}</small></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark">{{ p.get_property_type_display }}</span></td>
+                            <td class="fw-semibold">₹{{ p.price|floatformat:0|intcomma }}</td>
+                            <td><span class="status-ribbon status-{{ p.status }}">{{ p.get_status_display }}</span></td>
+                            <td>{{ p.views }}</td>
+                            <td>{{ p.fav_count }}</td>
+                            <td>
+                                <a href="{% url 'property_edit' p.slug %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'property_delete' p.slug %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">No properties yet. <a href="{% url 'property_create' %}">Add your first listing!</a></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

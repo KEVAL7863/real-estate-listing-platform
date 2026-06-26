@@ -1,0 +1,99 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EstateHub — Find Your Dream Property{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top app-nav">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+            <i class="bi bi-house-heart-fill text-warning"></i> EstateHub
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'property_list' %}">Properties</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.is_owner or user.is_platform_admin %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'property_create' %}"><i class="bi bi-plus-circle"></i> Add Property</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'my_favorites' %}"><i class="bi bi-heart"></i></a></li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="{% url 'messaging:inbox' %}">
+                            <i class="bi bi-chat-dots"></i>
+                            {% if navbar_unread %}<span class="badge rounded-pill bg-danger nav-badge">{{ navbar_unread }}</span>{% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-gear"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-warning btn-sm fw-semibold ms-lg-2" href="{% url 'accounts:register' %}">Get Started</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="app-footer mt-5">
+    <div class="container py-4">
+        <div class="row gy-3">
+            <div class="col-md-5">
+                <h5 class="fw-bold"><i class="bi bi-house-heart-fill text-warning"></i> EstateHub</h5>
+                <p class="text-white-50 mb-0">Your trusted partner for buying, selling and renting properties. Built with Django, PostgreSQL & Bootstrap 5.</p>
+            </div>
+            <div class="col-md-3">
+                <h6 class="fw-semibold">Quick Links</h6>
+                <a href="{% url 'home' %}" class="footer-link">Home</a>
+                <a href="{% url 'property_list' %}" class="footer-link">Browse Properties</a>
+                <a href="{% url 'accounts:register' %}" class="footer-link">Register</a>
+            </div>
+            <div class="col-md-4">
+                <h6 class="fw-semibold">Contact</h6>
+                <p class="text-white-50 mb-1"><i class="bi bi-envelope"></i> support@estatehub.example</p>
+                <p class="text-white-50"><i class="bi bi-geo-alt"></i> Ahmedabad, India</p>
+            </div>
+        </div>
+        <hr class="border-secondary">
+        <p class="text-center text-white-50 mb-0 small">© 2026 EstateHub. Demo project for learning purposes.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

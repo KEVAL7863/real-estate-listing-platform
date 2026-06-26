@@ -1,0 +1,36 @@
+{% load humanize %}
+<div class="card property-card fade-up">
+    <div class="card-img-wrap">
+        <a href="{{ property.get_absolute_url }}">
+            {% if property.primary_image %}
+                <img src="{{ property.primary_image }}" class="property-thumb" alt="{{ property.title }}">
+            {% else %}
+                <div class="property-thumb-placeholder"><i class="bi bi-house"></i></div>
+            {% endif %}
+        </a>
+        {% if show_status %}
+            <span class="status-ribbon status-{{ property.status }}">{{ property.get_status_display }}</span>
+        {% else %}
+            <span class="status-ribbon badge-{{ property.listing_type|lower }} text-white">{{ property.get_listing_type_display }}</span>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <button class="fav-btn {% if property.id in favorited_ids %}active{% endif %}"
+                data-url="{% url 'toggle_favorite' property.id %}" title="Save to favorites">
+            <i class="bi {% if property.id in favorited_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+        </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="price-tag">₹{{ property.price|floatformat:0|intcomma }}{% if property.listing_type == 'RENT' %}<small class="text-muted fs-6">/mo</small>{% endif %}</span>
+            <span class="badge badge-type">{{ property.get_property_type_display }}</span>
+        </div>
+        <h5 class="card-title mb-1"><a href="{{ property.get_absolute_url }}" class="text-decoration-none text-dark">{{ property.title|truncatechars:42 }}</a></h5>
+        <p class="meta-row mb-2"><i class="bi bi-geo-alt-fill"></i> {{ property.city }}{% if property.state %}, {{ property.state }}{% endif %}</p>
+        <div class="d-flex gap-3 meta-row border-top pt-2">
+            <span><i class="bi bi-door-open"></i> {{ property.bedrooms }} Bed</span>
+            <span><i class="bi bi-droplet"></i> {{ property.bathrooms }} Bath</span>
+            <span><i class="bi bi-arrows-fullscreen"></i> {{ property.area_sqft|intcomma }} ft²</span>
+        </div>
+    </div>
+</div>
